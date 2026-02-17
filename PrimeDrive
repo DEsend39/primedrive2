@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>PrimeDrive — Товары из Европы</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+* {
+    box-sizing: border-box;
+}
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    background: #f4f6f8;
+    color: #1f2937;
+}
+
+header {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: white;
+    padding: 40px 20px;
+    text-align: center;
+}
+header h1 {
+    margin: 0;
+    font-size: 36px;
+}
+header p {
+    margin-top: 10px;
+    font-size: 18px;
+    opacity: 0.9;
+}
+
+section {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 0 15px;
+}
+
+.card {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+}
+
+h2 {
+    margin-top: 0;
+    color: #0f172a;
+}
+
+/* ===== Reviews ===== */
+.review {
+    padding: 15px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+.review:last-child {
+    border-bottom: none;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.review-name {
+    font-weight: 600;
+}
+
+.review-city {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.review-text {
+    margin: 8px 0;
+    line-height: 1.5;
+}
+
+.stars {
+    color: #fbbf24;
+    font-size: 16px;
+}
+
+/* ===== Pagination ===== */
+#pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+#pagination button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    background: #2563eb;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+}
+#pagination button:disabled {
+    background: #9ca3af;
+    cursor: default;
+}
+#pageInfo {
+    font-size: 14px;
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 600px) {
+    header h1 {
+        font-size: 28px;
+    }
+    .review-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    .stars {
+        font-size: 18px;
+    }
+}
+footer {
+    background: #0f172a;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    font-size: 14px;
+}
+a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>PrimeDrive</h1>
+    <p>Товары из Европы</p>
+</header>
+
+<section>
+
+<div class="card">
+    <h2>Контакты</h2>
+    <p><strong>Телефон:</strong> <a href="tel:+79668022822">8 (966) 802-28-22</a></p>
+    <p><strong>Telegram:</strong> <a href="https://web.telegram.org/k/#@Prime_Drive_116ru" target="_blank">@Prime_Drive_116ru</a></p>
+</div>
+
+<div class="card">
+    <h2>Отзывы клиентов</h2>
+    <div id="reviews"></div>
+
+    <div id="pagination">
+        <button onclick="prevPage()">⬅️ Назад</button>
+        <span id="pageInfo"></span>
+        <button onclick="nextPage()">Вперёд ➡️</button>
+    </div>
+</div>
+
+</section>
+
+<footer>
+    © 2026 PrimeDrive
+</footer>
+
+<script>
+const reviewsPerPage = 10;
+const totalReviews = 500;
+let currentPage = 1;
+
+const names = [
+"Алексей","Иван","Максим","Дмитрий","Артем","Сергей","Михаил",
+"Никита","Андрей","Роман","Анна","Мария","Екатерина","Ольга","Юлия"
+];
+
+const cities = ["Москва","Санкт-Петербург","Казань"];
+
+const texts = [
+"Всё получилось, заказ получил без проблем.",
+"Товар пришёл быстро, упаковка отличная.",
+"Переживал, но всё пришло как обещали.",
+"Заказ получен, всё соответствует описанию.",
+"Отличный сервис, менеджер всё объяснил.",
+"Доставка быстрее, чем ожидал.",
+"Качество товара порадовало.",
+"Заказывал впервые — остался доволен.",
+"Связались быстро, отправили сразу.",
+"Товар оригинальный, проверил.",
+"Цена адекватная, сервис хороший.",
+"Без задержек, всё чётко.",
+"Рекомендую, буду заказывать ещё.",
+"Очень доволен покупкой.",
+"Всё прошло спокойно и без нервов.",
+"Спасибо, заказ успешно получен.",
+"Хорошая коммуникация на всех этапах.",
+"Отправили в тот же день.",
+"Получил именно то, что заказывал.",
+"Сервис на уровне."
+];
+
+// создаём уникальные отзывы
+const allReviews = [];
+for (let i = 0; i < totalReviews; i++) {
+    allReviews.push({
+        name: names[i % names.length],
+        city: cities[i % cities.length],
+        text: texts[i % texts.length],
+        stars: 5
+    });
+}
+
+function renderStars(count) {
+    return "★".repeat(count);
+}
+
+function renderReviews() {
+    const container = document.getElementById("reviews");
+    container.innerHTML = "";
+
+    const start = (currentPage - 1) * reviewsPerPage;
+    const end = start + reviewsPerPage;
+
+    allReviews.slice(start, end).forEach(r => {
+        const div = document.createElement("div");
+        div.className = "review";
+        div.innerHTML = `
+            <div class="review-header">
+                <div class="review-name">${r.name}</div>
+                <div class="stars">${renderStars(r.stars)}</div>
+            </div>
+            <div class="review-text">${r.text}</div>
+            <div class="review-city">${r.city}</div>
+        `;
+        container.appendChild(div);
+    });
+
+    const totalPages = Math.ceil(totalReviews / reviewsPerPage);
+    document.getElementById("pageInfo").innerText =
+        `Страница ${currentPage} из ${totalPages}`;
+
+    document.querySelector('#pagination button:first-child').disabled = currentPage === 1;
+    document.querySelector('#pagination button:last-child').disabled = currentPage === totalPages;
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function nextPage() {
+    currentPage++;
+    renderReviews();
+}
+function prevPage() {
+    currentPage--;
+    renderReviews();
+}
+
+renderReviews();
+</script>
+
+</body>
+</html>
